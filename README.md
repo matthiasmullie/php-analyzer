@@ -30,8 +30,9 @@ This will make this library available in your CI server.
 
 ### 2. CI build
 
-Add this to your `.travis.yml`'s `after_success` statements:
+Add this to your *.travis.yml*'s `after_success` statements:
 
+**.travis.yml**
 ```yml
 after_success:
   - vendor/bin/cauditor
@@ -51,9 +52,11 @@ and look at the results!
 
 ## Configuration
 
-Add a .cauditor.yml file to the root of your project. Available configuration
+Add a *.cauditor.yml* file to the root of your project. Available configuration
 options (and their defaults) are:
 
+
+**.cauditor.yml**
 ```yml
 # path where metrics data will be exported to
 build_path: build/cauditor
