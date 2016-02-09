@@ -1,8 +1,8 @@
 # [cauditor](https://www.cauditor.org) PHP analyzer
 
-[![Build status](https://api.travis-ci.org/cauditor/analyzer.svg?branch=master)](https://travis-ci.org/cauditor/analyzer)
-[![Code coverage](http://img.shields.io/codecov/c/github/cauditor/analyzer.svg)](https://codecov.io/github/cauditor/analyzer)
-[![Code quality](http://img.shields.io/scrutinizer/g/cauditor/analyzer.svg)](https://scrutinizer-ci.com/g/cauditor/analyzer)
+[![Build status](https://api.travis-ci.org/cauditor/php-analyzer.svg?branch=master)](https://travis-ci.org/cauditor/php-analyzer)
+[![Code coverage](http://img.shields.io/codecov/c/github/cauditor/php-analyzer.svg)](https://codecov.io/github/cauditor/php-analyzer)
+[![Code quality](http://img.shields.io/scrutinizer/g/cauditor/php-analyzer.svg)](https://scrutinizer-ci.com/g/cauditor/php-analyzer)
 [![Latest version](http://img.shields.io/packagist/v/cauditor/analyzer.svg)](https://packagist.org/packages/cauditor/analyzer)
 [![Downloads total](http://img.shields.io/packagist/dt/cauditor/analyzer.svg)](https://packagist.org/packages/cauditor/analyzer)
 
