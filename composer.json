@@ -1,0 +1,44 @@
+{
+  "name": "cauditor/analyzer",
+  "type": "library",
+  "description": "Generates & submits the metrics for cauditor.org",
+  "keywords": [
+    "php", "cauditor", "analyzer",
+    "maintainability index", "cyclomatic complexity", "halstead intelligent content",
+    "instability", "afferent coupling", "efferent coupling"
+  ],
+  "homepage": "http://www.cauditor.org",
+  "license": "MIT",
+  "authors": [
+    {
+      "name": "Matthias Mullie",
+      "homepage": "http://www.mullie.eu",
+      "email": "cauditor@mullie.eu",
+      "role": "Developer"
+    }
+  ],
+  "require": {
+    "php": "^5.3|^7.0",
+    "ext-curl": "*",
+    "pdepend/pdepend": "^2.1",
+    "symfony/yaml": "^2.0|^3.0"
+  },
+  "require-dev": {
+    "phpunit/phpunit": "^4.8|^5.0",
+    "fabpot/php-cs-fixer": "^1.0",
+    "matthiasmullie/php-skeleton": "1.0.2"
+  },
+  "autoload": {
+    "psr-4": {
+      "Cauditor\\": "src/"
+    }
+  },
+  "autoload-dev": {
+    "psr-4": {
+      "Cauditor\\Tests\\": "tests/"
+    }
+  },
+  "bin": [
+    "bin/cauditor"
+  ]
+}

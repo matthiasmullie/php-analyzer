@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<metrics generated="2016-02-09T16:44:34" pdepend="@package_version@" ahh="0" andc="0" calls="0" ccn="0" ccn2="0" cloc="5" clsa="0" clsc="1" eloc="5" fanout="0" leafs="1" lloc="1" loc="13" maxDIT="0" ncloc="8" noc="1" nof="0" noi="0" nom="0" nop="1" roots="0">
+  <files>
+    <file name="/Users/mmullie/Sites/php-skeleton/src/Skeleton.php" loc="13" cloc="5" eloc="5" lloc="1" ncloc="8"/>
+  </files>
+  <package name="MatthiasMullie\Skeleton" noc="1" noi="0" nom="0" nof="0" cr="0.15" rcr="0.15">
+    <class name="Skeleton" start="10" end="12" loc="3" cloc="0" eloc="0" lloc="0" ncloc="3" dit="0" noam="0" nocc="0" noom="0" nom="0" cr="0.15" rcr="0.15" ca="0" cbo="0" ce="0" impl="0" cis="0" csz="0" npm="0" vars="0" varsi="0" varsnp="0" wmc="0" wmci="0" wmcnp="0">
+      <file name="/Users/mmullie/Sites/php-skeleton/src/Skeleton.php"/>
+    </class>
+  </package>
+</metrics>

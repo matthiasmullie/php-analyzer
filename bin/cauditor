@@ -1,0 +1,15 @@
+#!/usr/bin/env php
+<?php
+if (file_exists(__DIR__ . '/../../../autoload.php')) {
+    require_once __DIR__ . '/../../../autoload.php';
+} else {
+    require_once __DIR__.'/../vendor/autoload.php';
+}
+
+try {
+    $config = new Cauditor\Config(getcwd(), getcwd() . DIRECTORY_SEPARATOR . '.cauditor.yml');
+    $analyzer = new Cauditor\Analyzer($config);
+    $analyzer->run('https://www.cauditor.org/api/submit');
+} catch (Exception $e) {
+    exit(1);
+}

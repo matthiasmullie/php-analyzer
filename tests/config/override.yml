@@ -1,0 +1,2 @@
+build_path: custom/build/path
+exclude_folders: [custom, exclude]
