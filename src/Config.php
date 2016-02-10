@@ -2,6 +2,7 @@
 
 namespace Cauditor;
 
+use MatthiasMullie\PathConverter\Converter;
 use Symfony\Component\Yaml\Exception\ParseException;
 use Symfony\Component\Yaml\Parser;
 
@@ -26,17 +27,29 @@ class Config implements \ArrayAccess
     );
 
     /**
-     * @param string $project Project path.
-     * @param string $config  Project path.
+     * List of config keys that denote paths, so they can be normalized
+     * (= turned into "relative to project root" instead of "relative to config
+     * file")
+     *
+     * @var string[]
+     */
+    protected $paths = array('build_path', 'exclude_folders');
+
+    /**
+     * @param string $project Project root path.
+     * @param string $config  Config YML file path.
      */
     public function __construct($project, $config = null)
     {
-        if ($config !== null) {
-            $this->config = $this->readConfig($config);
-        }
-        $this->config += $this->defaults;
-
         $this->config['path'] = rtrim($project, DIRECTORY_SEPARATOR);
+        $this->config['config_path'] = null;
+
+        if ($config !== null) {
+            $this->config['config_path'] = rtrim($config, DIRECTORY_SEPARATOR);
+            $this->config += $this->readConfig($config);
+        }
+
+        $this->config += $this->defaults;
 
         // *always* exclude some folders - they're not project-specific code and
         // could easily be overlooked when overriding excludes
@@ -44,9 +57,6 @@ class Config implements \ArrayAccess
         $this->config['exclude_folders'][] = '.git';
         $this->config['exclude_folders'][] = '.svn';
         $this->config['exclude_folders'] = array_unique($this->config['exclude_folders']);
-
-        $this->config['build_path'] = $this->normalizePath($this->config['build_path']);
-        $this->config['exclude_folders'] = $this->normalizePath($this->config['exclude_folders']);
     }
 
     /**
@@ -67,25 +77,8 @@ class Config implements \ArrayAccess
             return $value;
         }
 
-        // not even a directory in that path, can't be absolute
-        $seperator = strpos($value, DIRECTORY_SEPARATOR);
-        if ($seperator === false) {
-            return $this->config['path'].DIRECTORY_SEPARATOR.$value;
-        }
-
-        // Linux-style paths: `/path`
-        if ($seperator === 0) {
-            return $value;
-        }
-
-        // Windows-style paths: `C:/path`
-        $proto = strpos($value, ':');
-        if ($proto !== false && $proto < $seperator) {
-            return $value;
-        }
-
-        // probably relative path
-        return $this->config['path'].DIRECTORY_SEPARATOR.$value;
+        $converter = new Converter(dirname($this->config['config_path']), $this->config['path']);
+        return $converter->convert($value);
     }
 
     /**
@@ -102,10 +95,19 @@ class Config implements \ArrayAccess
         $yaml = new Parser();
 
         try {
-            return (array) $yaml->parse(file_get_contents($path));
+            $config = (array) $yaml->parse(file_get_contents($path));
         } catch (ParseException $e) {
             return array();
         }
+
+        // adjust relative paths
+        foreach ($this->paths as $key) {
+            if (isset($config[$key])) {
+                $config[$key] = $this->normalizePath($config[$key]);
+            }
+        }
+
+        return $config;
     }
 
     /**

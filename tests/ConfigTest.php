@@ -13,7 +13,7 @@ class ConfigTest extends PHPUnit_Framework_TestCase
     {
         parent::setUp();
 
-        $this->path = realpath(__DIR__.'/..');
+        $this->path = realpath(__DIR__.'/config');
     }
 
     public function testNoFile()
@@ -21,36 +21,36 @@ class ConfigTest extends PHPUnit_Framework_TestCase
         $config = new Config($this->path);
 
         // confirm that default value is used when no config is specified
-        $this->assertEquals($this->path.'/build/cauditor', $config['build_path']);
+        $this->assertEquals('build/cauditor', $config['build_path']);
     }
 
     public function testInvalidFile()
     {
-        $config = new Config($this->path, __DIR__.'/config/non-existing.yml');
+        $config = new Config($this->path, $this->path.'/non-existing.yml');
 
         // confirm that default value is used when invalid config is specified
-        $this->assertEquals($this->path.'/build/cauditor', $config['build_path']);
+        $this->assertEquals('build/cauditor', $config['build_path']);
     }
 
     public function testOverrideFile()
     {
-        $config = new Config($this->path, __DIR__.'/config/override.yml');
+        $config = new Config($this->path, $this->path.'/override.yml');
 
         // confirm that config-specified value is used
-        $this->assertEquals($this->path.'/custom/build/path', $config['build_path']);
+        $this->assertEquals('custom/build/path', $config['build_path']);
     }
 
     public function testEmptyFile()
     {
-        $config = new Config($this->path, __DIR__.'/config/empty.yml');
+        $config = new Config($this->path, $this->path.'/empty.yml');
 
         // confirm that default value is used for what's not in config
-        $this->assertEquals($this->path.'/build/cauditor', $config['build_path']);
+        $this->assertEquals('build/cauditor', $config['build_path']);
     }
 
     public function testEnforceExcludeFolders()
     {
-        $config = new Config($this->path, __DIR__.'/config/override.yml');
+        $config = new Config($this->path, $this->path.'/override.yml');
 
         // confirm that some folders (vendor, .git, ...) are always excluded,
         // even if they're not in config

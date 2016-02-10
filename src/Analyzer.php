@@ -24,6 +24,11 @@ class Analyzer
     protected $json = 'cauditor.json';
 
     /**
+     * @var string
+     */
+    protected $buildPath;
+
+    /**
      * @var Config
      */
     protected $config;
@@ -36,6 +41,10 @@ class Analyzer
     public function __construct(Config $config)
     {
         $this->config = $config;
+
+        // all paths in build_path are relative to project root, which may not
+        // be where this code is run from, so prepend the project root!
+        $this->buildPath = $this->config['path'].DIRECTORY_SEPARATOR.$this->config['build_path'];
     }
 
     /**
@@ -47,7 +56,7 @@ class Analyzer
      */
     public function run($api)
     {
-        exec('mkdir -p '.$this->config['build_path'], $output, $result);
+        exec('mkdir -p '.$this->buildPath, $output, $result);
         if ($result !== 0) {
             throw new Exception('Unable to create build directory.');
         }
@@ -66,9 +75,8 @@ class Analyzer
     protected function pdepend()
     {
         $path = $this->config['path'];
-        $xml = $this->config['build_path'].DIRECTORY_SEPARATOR.$this->xml;
+        $xml = $this->buildPath.DIRECTORY_SEPARATOR.$this->xml;
         $exclude = implode(',', $this->config['exclude_folders']);
-        var_dump($exclude);
 
         $command = "vendor/bin/pdepend --summary-xml=$xml --ignore=$exclude $path";
         exec($command, $output, $result);
@@ -85,8 +93,8 @@ class Analyzer
      */
     protected function convert()
     {
-        $xml = $this->config['build_path'].DIRECTORY_SEPARATOR.$this->xml;
-        $json = $this->config['build_path'].DIRECTORY_SEPARATOR.$this->json;
+        $xml = $this->buildPath.DIRECTORY_SEPARATOR.$this->xml;
+        $json = $this->buildPath.DIRECTORY_SEPARATOR.$this->json;
 
         $reader = new XMLReader();
         $reader->open($xml);
@@ -109,7 +117,7 @@ class Analyzer
      */
     protected function transmit($api)
     {
-        $handle = fopen($this->config['build_path'].DIRECTORY_SEPARATOR.$this->json, 'r');
+        $handle = fopen($this->buildPath.DIRECTORY_SEPARATOR.$this->json, 'r');
         $options = array(
             CURLOPT_URL => $api,
             CURLOPT_FOLLOWLOCATION => 1,
