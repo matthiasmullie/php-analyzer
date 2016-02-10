@@ -2,7 +2,7 @@
 
 namespace Cauditor;
 
-use MatthiasMullie\PathConverter\Converter;
+use MatthiasMullie\PathConverter\Converter as PathConverter;
 use Symfony\Component\Yaml\Exception\ParseException;
 use Symfony\Component\Yaml\Parser;
 
@@ -77,7 +77,7 @@ class Config implements \ArrayAccess
             return $value;
         }
 
-        $converter = new Converter(dirname($this->config['config_path']), $this->config['path']);
+        $converter = new PathConverter(dirname($this->config['config_path']), $this->config['path']);
         return $converter->convert($value);
     }
 
