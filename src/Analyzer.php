@@ -68,6 +68,7 @@ class Analyzer
         $path = $this->config['path'];
         $xml = $this->config['build_path'].DIRECTORY_SEPARATOR.$this->xml;
         $exclude = implode(',', $this->config['exclude_folders']);
+        var_dump($exclude);
 
         $command = "vendor/bin/pdepend --summary-xml=$xml --ignore=$exclude $path";
         exec($command, $output, $result);
