@@ -61,7 +61,7 @@ options (and their defaults) are:
 # path where metrics data will be exported to
 build_path: build/cauditor
 # folders to be excluded when analyzing code
-exclude_folders: ['tests', 'vendor']
+exclude_folders: [tests, vendor]
 ```
 
 *Note that, in addition to whatever is configured, folders 'vendors', '.git' &
