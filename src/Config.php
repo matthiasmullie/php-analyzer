@@ -29,7 +29,7 @@ class Config implements \ArrayAccess
     /**
      * List of config keys that denote paths, so they can be normalized
      * (= turned into "relative to project root" instead of "relative to config
-     * file")
+     * file").
      *
      * @var string[]
      */
@@ -78,6 +78,7 @@ class Config implements \ArrayAccess
         }
 
         $converter = new PathConverter(dirname($this->config['config_path']), $this->config['path']);
+
         return $converter->convert($value);
     }
 

@@ -15,15 +15,10 @@ class ConverterTest extends PHPUnit_Framework_TestCase
         $reader = new XMLReader();
         $reader->open(__DIR__.'/build/pdepend.xml');
 
-        $handle = fopen('php://temp', 'w+');
+        $converter = new Converter($reader);
+        $result = $converter->convert($reader);
 
-        $converter = new Converter($reader, $handle);
-        $converter->convert();
-
-        fseek($handle, 0);
         $expect = file_get_contents(__DIR__.'/build/cauditor.json');
-        $this->assertEquals($expect, stream_get_contents($handle));
-
-        fclose($handle);
+        $this->assertEquals($expect, $result);
     }
 }

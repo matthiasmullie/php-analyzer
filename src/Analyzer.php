@@ -61,10 +61,20 @@ class Analyzer
             throw new Exception('Unable to create build directory.');
         }
 
+        // let pdepend generate all metrics we'll need
         $this->pdepend();
-        $this->convert();
 
-        return $this->transmit($api);
+        // convert pdepend xml into cauditor json & store to file
+        $json = $this->convert($this->buildPath.DIRECTORY_SEPARATOR.$this->xml);
+        file_put_contents($this->buildPath.DIRECTORY_SEPARATOR.$this->json, $json);
+
+        $data = $this->sniff();
+        // if we expect these json files to be loaded client-side to render
+        // the charts, might as well assume it'll fit in this machine's
+        // memory to submit it to our API ;)
+        $data['json'] = $json;
+
+        return $this->transmit($api, $data);
     }
 
     /**
@@ -86,51 +96,67 @@ class Analyzer
     }
 
     /**
-     * Transform pdepend output into the (more succinct) format cauditor
-     * understands.
+     * Fetch build data from CI.
+     *
+     * @return string[]
      *
      * @throws Exception
      */
-    protected function convert()
+    protected function sniff()
     {
-        $xml = $this->buildPath.DIRECTORY_SEPARATOR.$this->xml;
-        $json = $this->buildPath.DIRECTORY_SEPARATOR.$this->json;
+        $build = exec('vendor/bin/ci-sniffer', $output, $result);
+        if ($result !== 0) {
+            throw new Exception('Unable to get build details.');
+        }
 
-        $reader = new XMLReader();
-        $reader->open($xml);
-
-        $handle = fopen($json, 'w');
-
-        $converter = new Converter($reader, $handle);
-        $converter->convert();
-
-        fclose($handle);
-        $reader->close();
+        return (array) json_decode($build);
     }
 
     /**
-     * Submit the file to cauditor API.
+     * Transform pdepend output into the (more succinct) format cauditor
+     * understands.
      *
-     * @param string $api
+     * @param string $xml
+     *
+     * @return string
+     *
+     * @throws Exception
+     */
+    protected function convert($xml)
+    {
+        $reader = new XMLReader();
+        $reader->open($xml);
+
+        $converter = new Converter();
+        $json = $converter->convert($reader);
+
+        $reader->close();
+
+        return $json;
+    }
+
+    /**
+     * Submit the data to cauditor API.
+     *
+     * @param string   $api
+     * @param string[] $data
      *
      * @return string|bool API response (on success) or false (on failure)
      */
-    protected function transmit($api)
+    protected function transmit($api, $data)
     {
-        $handle = fopen($this->buildPath.DIRECTORY_SEPARATOR.$this->json, 'r');
         $options = array(
             CURLOPT_URL => $api,
             CURLOPT_FOLLOWLOCATION => 1,
-            CURLOPT_PUT => 1,
-            CURLOPT_INFILE => $handle,
             CURLOPT_RETURNTRANSFER => 1,
+            CURLOPT_POST => 1,
+            CURLOPT_POSTFIELDS => $data,
         );
 
         $curl = curl_init();
         curl_setopt_array($curl, $options);
         $result = curl_exec($curl);
         curl_close($curl);
-        fclose($handle);
 
         return $result;
     }

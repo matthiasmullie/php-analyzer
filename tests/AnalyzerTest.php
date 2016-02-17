@@ -29,16 +29,26 @@ class AnalyzerTest extends PHPUnit_Framework_TestCase
 
         $path = __DIR__.'/../vendor/matthiasmullie/php-skeleton';
         $config = __DIR__.'/analyze/php-skeleton.yml';
+        $expect = file_get_contents(__DIR__.'/build/cauditor.json');
 
         $config = new Config($path, $config);
         $analyzer = new Analyzer($config);
         $result = $analyzer->run($this->api.'/api.php');
 
-        $expect = file_get_contents(__DIR__.'/build/cauditor.json');
         // generated JSON file
         $this->assertEquals($expect, file_get_contents(__DIR__.'/analyze/tmp/cauditor.json'));
+
         // submitted to API
-        $this->assertEquals($expect, $result);
+        $result = (array) json_decode($result);
+        $this->assertEquals($expect, $result['json']);
+
+        /*
+         * We're generating metrics for a different project than this one, but
+         * for build data we can't: this is the project we're building, and this
+         * is the project we'll get data for... We can't expect this to be
+         * php-skeleton, so let's see if it correctly recognized this project.
+         */
+        $this->assertEquals('cauditor/php-analyzer', $result['slug']);
     }
 
     /**
