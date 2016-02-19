@@ -10,6 +10,13 @@ namespace Cauditor;
 class Converter
 {
     /**
+     * Project-wide totals.
+     *
+     * @var array
+     */
+    protected $totals = array();
+
+    /**
      * Processes XML node by node, extracts the relevant metrics & writes them
      * piecemeal to a JSON file.
      *
@@ -23,16 +30,19 @@ class Converter
     {
         $reader->readNext('metrics');
 
+        $this->totals = array();
+        $packages = $this->convertPackages($reader);
+
         $data = array(
-            'loc' => $reader->getAttribute('eloc'),
-            'noc' => $reader->getAttribute('noc'),
-            'nom' => $reader->getAttribute('nom'),
-        );
+                'loc' => $reader->getAttribute('eloc'),
+                'noc' => $reader->getAttribute('noc'),
+                'nom' => $reader->getAttribute('nom'),
+            ) + $this->totals;
 
         $json = json_encode($data);
-        // data will be stored as json, but we need to fetch children, so
+        // data will be stored as json, but we need to inject children, so
         // don't write the closing `]` & `}` yet
-        return substr($json, 0, -1).',"children":['.$this->convertPackages($reader).']}';
+        return substr($json, 0, -1).',"children":['.$packages.']}';
     }
 
     protected function convertPackages(XMLReader $reader)
@@ -41,6 +51,8 @@ class Converter
         $content = '';
         while ($reader->readNext('package', 'metrics')) {
             $data = array('name' => $reader->getAttribute('name'));
+
+            $this->addToTotals($data);
 
             $json = json_encode($data);
             // add `,` between multiple nodes
@@ -67,6 +79,8 @@ class Converter
                 'dit' => (int) $reader->getAttribute('dit'),
             );
 
+            $this->addToTotals($data);
+
             $json = json_encode($data);
             // add `,` between multiple nodes
             $json = $i++ === 0 ? $json : ','.$json;
@@ -92,6 +106,9 @@ class Converter
                 'hi' => (float) number_format($reader->getAttribute('hi'), 2),
                 'mi' => (float) number_format($reader->getAttribute('mi'), 2),
             );
+
+            $this->addToTotals($data);
+
             $json = json_encode($data);
             // add `,` between multiple nodes
             $json = $i++ === 0 ? $json : ','.$json;
@@ -100,5 +117,19 @@ class Converter
         }
 
         return $content;
+    }
+
+    protected function addToTotals(array $data)
+    {
+        // don't need these, obviously...
+        unset($data['name'], $data['loc']);
+
+        foreach ($data as $metric => $value) {
+            if (!isset($this->totals[$metric])) {
+                $this->totals[$metric] = 0;
+            }
+
+            $this->totals[$metric] += $value;
+        }
     }
 }
