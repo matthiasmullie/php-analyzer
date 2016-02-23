@@ -72,7 +72,7 @@ class Analyzer
         // if we expect these json files to be loaded client-side to render
         // the charts, might as well assume it'll fit in this machine's
         // memory to submit it to our API ;)
-        $data['json'] = $json;
+        $data['json'] = json_decode($json);
 
         return $this->transmit($api, $data);
     }
@@ -138,25 +138,42 @@ class Analyzer
     /**
      * Submit the data to cauditor API.
      *
-     * @param string   $api
-     * @param string[] $data
+     * @param string $api
+     * @param array  $data
      *
      * @return string|bool API response (on success) or false (on failure)
      */
-    protected function transmit($api, $data)
+    protected function transmit($api, array $data)
     {
+        // PUT requests need a fopen wrapper, so we'll create a temporary one
+        // for the data to submit...
+        $json = json_encode($data);
+        $file = fopen('php://temp', 'w+');
+        fwrite($file, $json, strlen($json));
+        fseek($file, 0);
+
+        // url needs some variable data, so we'll parse it in
+        $api = preg_replace_callback('/\{([a-z0-9]+)\}/i', function ($match) use ($data) {
+            return isset($data[$match[1]]) ? $data[$match[1]] : $match[0];
+        }, $api);
+        // if parts of url are now empty, just omit them (e.g. branch could be)
+        $api = str_replace('//', '/', $api);
+
         $options = array(
             CURLOPT_URL => $api,
             CURLOPT_FOLLOWLOCATION => 1,
             CURLOPT_RETURNTRANSFER => 1,
-            CURLOPT_POST => 1,
-            CURLOPT_POSTFIELDS => $data,
+            CURLOPT_PUT => 1,
+            CURLOPT_INFILE => $file,
+            CURLOPT_INFILESIZE => strlen($json),
         );
 
         $curl = curl_init();
         curl_setopt_array($curl, $options);
         $result = curl_exec($curl);
         curl_close($curl);
+
+        fclose($file);
 
         return $result;
     }

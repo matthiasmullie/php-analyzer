@@ -40,7 +40,7 @@ class AnalyzerTest extends PHPUnit_Framework_TestCase
 
         // submitted to API
         $result = (array) json_decode($result);
-        $this->assertEquals($expect, $result['json']);
+        $this->assertEquals($expect, json_encode($result['json']));
 
         /*
          * We're generating metrics for a different project than this one, but

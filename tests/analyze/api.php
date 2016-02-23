@@ -1,3 +1,3 @@
 <?php
 
-echo json_encode($_POST);
+echo file_get_contents('php://input');
