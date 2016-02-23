@@ -7,7 +7,7 @@ if (file_exists(__DIR__ . '/../../../autoload.php')) {
 }
 
 try {
-    $config = new Cauditor\Config(getcwd(), getcwd() . DIRECTORY_SEPARATOR . '.cauditor.yml');
+    $config = new Cauditor\Config(getcwd(), getcwd().DIRECTORY_SEPARATOR.'.cauditor.yml');
     $analyzer = new Cauditor\Analyzer($config);
     $analyzer->run('https://www.cauditor.org/api/v1/{slug}/{branch}/{commit}');
 } catch (Exception $e) {

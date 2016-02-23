@@ -23,8 +23,6 @@ class Converter
      * @param XMLReader $reader XML document to read from.
      *
      * @return string
-     *
-     * @throws Exception
      */
     public function convert(XMLReader $reader)
     {

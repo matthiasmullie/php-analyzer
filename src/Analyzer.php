@@ -2,6 +2,10 @@
 
 namespace Cauditor;
 
+use MatthiasMullie\CI\Factory as CIFactory;
+use MatthiasMullie\PathConverter\Converter as PathConverter;
+use PDepend\Application;
+
 /**
  * @author Matthias Mullie <cauditor@mullie.eu>
  * @copyright Copyright (c) 2016, Matthias Mullie. All rights reserved.
@@ -84,13 +88,20 @@ class Analyzer
      */
     protected function pdepend()
     {
-        $path = $this->config['path'];
-        $xml = $this->buildPath.DIRECTORY_SEPARATOR.$this->xml;
-        $exclude = implode(',', $this->config['exclude_folders']);
+        $application = new Application();
+        $runner = $application->getRunner();
 
-        $command = "vendor/bin/pdepend --summary-xml=$xml --ignore=$exclude $path";
-        exec($command, $output, $result);
-        if ($result !== 0) {
+        $runner->setSourceArguments(array($this->config['path']));
+        $runner->addReportGenerator('summary-xml', $this->buildPath.DIRECTORY_SEPARATOR.$this->xml);
+
+        // exclude directories are evaluated relative to where pdepend is being
+        // run from, not what it is running on
+        $converter = new PathConverter($this->config['path'], getcwd());
+        $exclude = array_map(array($converter, 'convert'), $this->config['exclude_folders']);
+        $runner->setExcludeDirectories($exclude);
+
+        $status = $runner->run();
+        if ($status !== 0) {
             throw new Exception('Unable to generate pdepend metrics.');
         }
     }
@@ -99,17 +110,22 @@ class Analyzer
      * Fetch build data from CI.
      *
      * @return string[]
-     *
-     * @throws Exception
      */
     protected function sniff()
     {
-        $build = exec('vendor/bin/ci-sniffer', $output, $result);
-        if ($result !== 0) {
-            throw new Exception('Unable to get build details.');
-        }
+        $factory = new CIFactory();
+        $environment = $factory->getCurrent();
 
-        return (array) json_decode($build);
+        return array(
+            'repo' => $environment->getRepo(),
+            'slug' => $environment->getSlug(),
+            'branch' => $environment->getBranch(),
+            'pull-request' => $environment->getPullRequest(),
+            'commit' => $environment->getCommit(),
+            'previous-commit' => $environment->getPreviousCommit(),
+            'author-email' => $environment->getAuthorEmail(),
+            'timestamp' => $environment->getTimestamp(),
+        );
     }
 
     /**
@@ -119,8 +135,6 @@ class Analyzer
      * @param string $xml
      *
      * @return string
-     *
-     * @throws Exception
      */
     protected function convert($xml)
     {
