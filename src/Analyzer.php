@@ -157,7 +157,7 @@ class Analyzer
             return isset($data[$match[1]]) ? $data[$match[1]] : $match[0];
         }, $api);
         // if parts of url are now empty, just omit them (e.g. branch could be)
-        $api = str_replace('//', '/', $api);
+        $api = preg_replace('/(?<!:)\/+/', '/', $api);
 
         $options = array(
             CURLOPT_URL => $api,
