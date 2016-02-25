@@ -13,7 +13,8 @@ class Help implements RunnerInterface
     {
         echo "Usage: cauditor [-ah] [path]\n\n",
             "  --all           Analyzes all missing commits (instead of only the current).\n",
-            "  --help          Prints this help message.\n",
-            "  --path=<dir>    Analyze a specific directory (instead of pwd).\n";
+            "  --path=<dir>    Analyze a specific directory (instead of pwd).\n",
+            "  --repo=<uri>    Analyze a specific repo (instead of the one in pwd).\n",
+            "  --help          Prints this help message.\n";
     }
 }

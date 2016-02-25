@@ -32,7 +32,7 @@ class Api
     public function get($uri)
     {
         $options = array(
-            CURLOPT_URL => $this->api . $uri,
+            CURLOPT_URL => $this->api.$uri,
             CURLOPT_FOLLOWLOCATION => 1,
             CURLOPT_RETURNTRANSFER => 1,
         );
@@ -58,7 +58,7 @@ class Api
         fseek($file, 0);
 
         $options = array(
-            CURLOPT_URL => $this->api . $uri,
+            CURLOPT_URL => $this->api.$uri,
             CURLOPT_FOLLOWLOCATION => 1,
             CURLOPT_RETURNTRANSFER => 1,
             CURLOPT_PUT => 1,

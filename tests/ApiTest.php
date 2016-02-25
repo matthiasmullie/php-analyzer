@@ -3,7 +3,6 @@
 namespace Cauditor\Tests;
 
 use Cauditor\Api;
-use Cauditor\Exception;
 use PHPUnit_Framework_TestCase;
 
 class ApiTest extends PHPUnit_Framework_TestCase

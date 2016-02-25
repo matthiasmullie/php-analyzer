@@ -26,8 +26,8 @@ class All extends Current implements RunnerInterface
     protected $branch;
 
     /**
-     * @param Config $config
-     * @param Api $api
+     * @param Config            $config
+     * @param Api               $api
      * @param AnalyzerInterface $analyzer
      */
     public function __construct(Config $config, Api $api, AnalyzerInterface $analyzer)
@@ -91,7 +91,7 @@ class All extends Current implements RunnerInterface
      */
     protected function getDefaultBranch()
     {
-        $config = shell_exec("cat .git/config");
+        $config = shell_exec('cat .git/config');
         preg_match('/\[branch "(.+)"\]/', $config, $match);
 
         return isset($match[1]) ? $match[1] : 'master';
@@ -100,7 +100,9 @@ class All extends Current implements RunnerInterface
     /**
      * @param string $slug
      * @param string $branch
+     *
      * @return string[]
+     *
      * @throws Exception
      */
     protected function getImportedCommits($slug, $branch)

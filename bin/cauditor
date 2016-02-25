@@ -7,11 +7,18 @@ if (file_exists(__DIR__ . '/../../../autoload.php')) {
 }
 
 try {
-    $opts = getopt('a::h::p::', array('all::', 'help::', 'path::'));
+    $opts = getopt('a::h::p::r::', array('all::', 'help::', 'path::', 'repo::'));
+
+    // check if there's a repo to import
+    $repo = isset($opts['r']) ? $opts['r'] : isset($opts['repo']) ? $opts['repo'] : false;
 
     // path to project (can be passed by param, or defaults to pwd
     $path = isset($opts['p']) ? $opts['p'] : isset($opts['path']) ? $opts['path'] : false;
     $path = $path ?: getcwd();
+
+    if ($repo !== false) {
+        exec("git clone $repo $path");
+    }
 
     // bootstrap
     $config = new Cauditor\Config($path, $path.DIRECTORY_SEPARATOR.'.cauditor.yml');

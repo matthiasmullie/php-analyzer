@@ -31,8 +31,8 @@ class Current implements RunnerInterface
     protected $analyzer;
 
     /**
-     * @param Config $config
-     * @param Api $api
+     * @param Config            $config
+     * @param Api               $api
      * @param AnalyzerInterface $analyzer
      */
     public function __construct(Config $config, Api $api, AnalyzerInterface $analyzer)
