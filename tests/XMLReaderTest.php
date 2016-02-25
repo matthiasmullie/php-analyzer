@@ -2,7 +2,7 @@
 
 namespace Cauditor\Tests;
 
-use Cauditor\XMLReader;
+use Cauditor\Analyzers\XMLReader;
 use PHPUnit_Framework_TestCase;
 
 class XMLReaderTest extends PHPUnit_Framework_TestCase

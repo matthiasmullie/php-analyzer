@@ -2,8 +2,8 @@
 
 namespace Cauditor\Tests;
 
-use Cauditor\Converter;
-use Cauditor\XMLReader;
+use Cauditor\Analyzers\Converter;
+use Cauditor\Analyzers\XMLReader;
 use PHPUnit_Framework_TestCase;
 
 class ConverterTest extends PHPUnit_Framework_TestCase
