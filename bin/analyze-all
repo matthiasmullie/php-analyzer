@@ -1,7 +1,0 @@
-1: get missing commits
-2: clone (all of) current dir into /build/
-3: cd /build/...
-4: git reset & checkout branch
-5: list commits
-6: iterate missing commits
-7: analyze & submit
