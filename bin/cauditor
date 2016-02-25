@@ -7,11 +7,25 @@ if (file_exists(__DIR__ . '/../../../autoload.php')) {
 }
 
 try {
-    $config = new Cauditor\Config(getcwd(), getcwd().DIRECTORY_SEPARATOR.'.cauditor.yml');
+    $opts = getopt('a::h::p::', array('all::', 'help::', 'path::'));
+
+    // path to project (can be passed by param, or defaults to pwd
+    $path = isset($opts['p']) ? $opts['p'] : isset($opts['path']) ? $opts['path'] : false;
+    $path = $path ?: getcwd();
+
+    // bootstrap
+    $config = new Cauditor\Config($path, $path.DIRECTORY_SEPARATOR.'.cauditor.yml');
     $analyzer = new Cauditor\Analyzers\PDepend($config);
     $api = new \Cauditor\Api('https://www.cauditor.org');
 
-    $runner = new \Cauditor\Runners\Current($config, $api, $analyzer);
+    if (isset($opts['h']) || isset($opts['help'])) {
+        $runner = new \Cauditor\Runners\Help();
+    } elseif (isset($opts['a']) || isset($opts['all'])) {
+        $runner = new \Cauditor\Runners\All($config, $api, $analyzer);
+    } else {
+        $runner = new \Cauditor\Runners\Current($config, $api, $analyzer);
+    }
+
     $runner->execute();
 } catch (Exception $e) {
     exit(1);

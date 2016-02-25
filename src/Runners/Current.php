@@ -49,12 +49,27 @@ class Current implements RunnerInterface
     {
         $metrics = $this->analyzer->execute();
 
+        $data = array('metrics' => $metrics) + $this->getEnvironment();
+
+        // submit to cauditor (note that branch can be empty for PRs)
+        $uri = "/api/v1/{$data['slug']}/{$data['branch']}/{$data['commit']}";
+        $uri = preg_replace('/(?<!:)\/+/', '/', $uri);
+
+        $this->api->put($uri, $data);
+
+        echo "Submitted metrics for {$data['commit']} @ {$data['slug']} {$data['branch']}\n";
+    }
+
+    /**
+     * @return array
+     */
+    protected function getEnvironment()
+    {
         // get build data from CI
         $factory = new CIFactory();
         $environment = $factory->getCurrent();
 
-        $data = array(
-            'metrics' => $metrics,
+        return array(
             'repo' => $environment->getRepo(),
             'slug' => $environment->getSlug(),
             'branch' => $environment->getBranch(),
@@ -64,12 +79,5 @@ class Current implements RunnerInterface
             'author-email' => $environment->getAuthorEmail(),
             'timestamp' => $environment->getTimestamp(),
         );
-
-        // submit to cauditor (note that branch can be empty for PRs)
-        $uri = "/api/v1/{$data['slug']}/{$data['branch']}/{$data['commit']}";
-        $uri = preg_replace('/(?<!:)\/+/', '/', $uri);
-        $this->api->put($uri, $data);
-
-        echo "Submitted metrics for {$data['commit']} @ {$data['slug']} {$data['branch']}\n";
     }
 }
