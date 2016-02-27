@@ -55,9 +55,13 @@ class Current implements RunnerInterface
         $uri = "/api/v1/{$data['slug']}/{$data['branch']}/{$data['commit']}";
         $uri = preg_replace('/(?<!:)\/+/', '/', $uri);
 
-        $this->api->put($uri, $data);
+        $result = $this->api->put($uri, $data);
 
-        echo "Submitted metrics for {$data['commit']} @ {$data['slug']} {$data['branch']}\n";
+        if ($result !== false) {
+            echo "Submitted metrics for {$data['commit']} @ {$data['slug']} {$data['branch']}\n";
+        } else {
+            echo "Failed to submit metrics for {$data['commit']} @ {$data['slug']} {$data['branch']}\n";
+        }
     }
 
     /**
