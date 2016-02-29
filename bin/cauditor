@@ -19,6 +19,7 @@ try {
     if ($repo !== false) {
         exec("git clone $repo $path");
     }
+    chdir("$path");
 
     // bootstrap
     $config = new Cauditor\Config($path, $path.DIRECTORY_SEPARATOR.'.cauditor.yml');
