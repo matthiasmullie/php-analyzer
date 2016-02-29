@@ -2,7 +2,7 @@
 
 namespace Cauditor\Tests;
 
-use Cauditor\Analyzers\PDepend;
+use Cauditor\Analyzers\PDepend\Analyzer as PDependAnalyzer;
 use Cauditor\Config;
 use PHPUnit_Framework_TestCase;
 
@@ -15,7 +15,7 @@ class PDependTest extends PHPUnit_Framework_TestCase
         $expect = file_get_contents(__DIR__.'/build/cauditor.json');
 
         $config = new Config($path, $config);
-        $analyzer = new PDepend($config);
+        $analyzer = new PDependAnalyzer($config);
         $metrics = $analyzer->execute();
 
         // generated JSON

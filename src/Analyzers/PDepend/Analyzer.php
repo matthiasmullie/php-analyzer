@@ -1,26 +1,21 @@
 <?php
 
-namespace Cauditor\Analyzers;
+namespace Cauditor\Analyzers\PDepend;
 
+use Cauditor\Analyzers\AnalyzerInterface;
 use Cauditor\Config;
 use Cauditor\Exception;
 use MatthiasMullie\PathConverter\Converter as PathConverter;
 use PDepend\Application;
+use PDepend\Input\ExcludePathFilter;
 
 /**
  * @author Matthias Mullie <cauditor@mullie.eu>
  * @copyright Copyright (c) 2016, Matthias Mullie. All rights reserved.
  * @license LICENSE MIT
  */
-class PDepend implements AnalyzerInterface
+class Analyzer implements AnalyzerInterface
 {
-    /**
-     * pdepend XML filename.
-     *
-     * @var string
-     */
-    protected $xml = 'pdepend.xml';
-
     /**
      * cauditor JSON filename.
      *
@@ -73,13 +68,11 @@ class PDepend implements AnalyzerInterface
         // let pdepend generate all metrics we'll need
         $this->pdepend();
 
-        // convert pdepend xml into cauditor json & store to file
-        $json = $this->convert($this->buildPath.DIRECTORY_SEPARATOR.$this->xml);
-        file_put_contents($this->buildPath.DIRECTORY_SEPARATOR.$this->json, $json);
-
         // if we expect these json files to be loaded client-side to render
         // the charts, might as well assume it'll fit in this machine's
         // memory to submit it to our API ;)
+        $json = file_get_contents($this->buildPath.DIRECTORY_SEPARATOR.$this->json);
+
         return json_decode($json);
     }
 
@@ -90,42 +83,26 @@ class PDepend implements AnalyzerInterface
      */
     protected function pdepend()
     {
-        $application = new Application();
-        $runner = $application->getRunner();
+        $jsonGenerator = new JsonGenerator();
+        $jsonGenerator->setLogFile($this->buildPath.DIRECTORY_SEPARATOR.$this->json);
 
-        $runner->setSourceArguments(array($this->config['path']));
-        $runner->addReportGenerator('summary-xml', $this->buildPath.DIRECTORY_SEPARATOR.$this->xml);
+        $application = new Application();
+        $engine = $application->getEngine();
+        $engine->addReportGenerator($jsonGenerator);
+
+        $engine->addDirectory($this->config['path']);
 
         // exclude directories are evaluated relative to where pdepend is being
         // run from, not what it is running on
         $converter = new PathConverter($this->config['path'], getcwd());
         $exclude = array_map(array($converter, 'convert'), $this->config['exclude_folders']);
-        $runner->setExcludeDirectories($exclude);
+        $filter = new ExcludePathFilter($exclude);
+        $engine->addFileFilter($filter);
 
-        $status = $runner->run();
-        if ($status !== 0) {
+        try {
+            $engine->analyze();
+        } catch (\Exception $e) {
             throw new Exception('Unable to generate pdepend metrics.');
         }
-    }
-
-    /**
-     * Transform pdepend output into the (more succinct) format cauditor
-     * understands.
-     *
-     * @param string $xml
-     *
-     * @return string
-     */
-    protected function convert($xml)
-    {
-        $reader = new XMLReader();
-        $reader->open($xml);
-
-        $converter = new Converter();
-        $json = $converter->convert($reader);
-
-        $reader->close();
-
-        return $json;
     }
 }

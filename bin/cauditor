@@ -23,7 +23,7 @@ try {
 
     // bootstrap
     $config = new Cauditor\Config($path, $path.DIRECTORY_SEPARATOR.'.cauditor.yml');
-    $analyzer = new Cauditor\Analyzers\PDepend($config);
+    $analyzer = new Cauditor\Analyzers\PDepend\Analyzer($config);
     $api = new \Cauditor\Api('https://www.cauditor.org');
 
     if (isset($opts['h']) || isset($opts['help'])) {
