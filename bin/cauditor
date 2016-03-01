@@ -22,7 +22,11 @@ try {
     $path = $path ?: getcwd();
 
     if ($repo !== false) {
-        exec("git clone $repo $path");
+        if (isset($opts['all'])) {
+            exec("git clone $repo $path");
+        } else {
+            exec("git clone --depth=1 $repo $path");
+        }
     }
     chdir("$path");
 
