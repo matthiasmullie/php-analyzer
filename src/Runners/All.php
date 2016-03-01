@@ -62,7 +62,7 @@ class All extends Current implements RunnerInterface
 
         // now analyze all missing commits
         foreach ($missing as $commit) {
-            exec("git checkout $commit && git reset --hard");
+            exec("git reset $commit --hard");
 
             $config = new Config(getcwd(), getcwd().DIRECTORY_SEPARATOR.'.cauditor.yml');
             $this->analyzer->setConfig($config);
@@ -113,19 +113,5 @@ class All extends Current implements RunnerInterface
         }
 
         return json_decode($imported);
-    }
-
-    /**
-     * @return array
-     */
-    protected function getEnvironment()
-    {
-        $data = parent::getEnvironment();
-
-        // override branch: ci-sniffer's data is unreliable here because we're
-        // not really on the branch we're importing, but on detached commits
-        $data['branch'] = $this->branch;
-
-        return $data;
     }
 }
