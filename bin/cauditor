@@ -7,13 +7,18 @@ if (file_exists(__DIR__ . '/../../../autoload.php')) {
 }
 
 try {
-    $opts = getopt('a::h::p::r::', array('all::', 'help::', 'path::', 'repo::'));
+    $opts = \Cauditor\Utils::getopts(array(
+        'a' => 'all',
+        'h' => 'help',
+        'p:' => 'path:',
+        'r:' => 'repo:',
+    ));
 
     // check if there's a repo to import
-    $repo = isset($opts['r']) ? $opts['r'] : isset($opts['repo']) ? $opts['repo'] : false;
+    $repo = isset($opts['repo']) ? $opts['repo'] : false;
 
     // path to project (can be passed by param, or defaults to pwd
-    $path = isset($opts['p']) ? $opts['p'] : isset($opts['path']) ? $opts['path'] : false;
+    $path = isset($opts['path']) ? $opts['path'] : false;
     $path = $path ?: getcwd();
 
     if ($repo !== false) {
@@ -26,9 +31,9 @@ try {
     $analyzer = new Cauditor\Analyzers\PDepend\Analyzer($config);
     $api = new \Cauditor\Api('https://www.cauditor.org');
 
-    if (isset($opts['h']) || isset($opts['help'])) {
+    if (isset($opts['help'])) {
         $runner = new \Cauditor\Runners\Help();
-    } elseif (isset($opts['a']) || isset($opts['all'])) {
+    } elseif (isset($opts['all'])) {
         $runner = new \Cauditor\Runners\All($config, $api, $analyzer);
     } else {
         $runner = new \Cauditor\Runners\Current($config, $api, $analyzer);
