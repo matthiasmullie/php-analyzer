@@ -23,9 +23,9 @@ class Commits extends All implements RunnerInterface
      *
      * @param array $commits
      */
-    public function __construct(Config $config, Api $api, AnalyzerInterface $analyzer, array $commits)
+    public function __construct(Api $api, AnalyzerInterface $analyzer, array $commits)
     {
-        parent::__construct($config, $api, $analyzer);
+        parent::__construct($api, $analyzer);
 
         $this->commits = $commits;
     }

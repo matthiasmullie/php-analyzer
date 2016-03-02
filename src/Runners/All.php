@@ -16,11 +16,6 @@ use MatthiasMullie\CI\Factory as CIFactory;
 class All implements RunnerInterface
 {
     /**
-     * @var Config
-     */
-    protected $config;
-
-    /**
      * @var Api
      */
     protected $api;
@@ -41,13 +36,11 @@ class All implements RunnerInterface
     protected $branch;
 
     /**
-     * @param Config            $config
      * @param Api               $api
      * @param AnalyzerInterface $analyzer
      */
-    public function __construct(Config $config, Api $api, AnalyzerInterface $analyzer)
+    public function __construct(Api $api, AnalyzerInterface $analyzer)
     {
-        $this->config = $config;
         $this->api = $api;
         $this->analyzer = $analyzer;
 

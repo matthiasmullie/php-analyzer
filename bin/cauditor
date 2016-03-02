@@ -42,12 +42,12 @@ try {
     $api = new \Cauditor\Api('https://www.cauditor.org');
 
     if (isset($opts['all'])) {
-        $runner = new \Cauditor\Runners\All($config, $api, $analyzer);
+        $runner = new \Cauditor\Runners\All($api, $analyzer);
     } elseif (isset($opts['commits'])) {
         $commits = explode(',', $opts['commits']);
-        $runner = new \Cauditor\Runners\Commits($config, $api, $analyzer, $commits);
+        $runner = new \Cauditor\Runners\Commits($api, $analyzer, $commits);
     } else {
-        $runner = new \Cauditor\Runners\Current($config, $api, $analyzer);
+        $runner = new \Cauditor\Runners\Current($api, $analyzer);
     }
 
     if (isset($opts['branch'])) {

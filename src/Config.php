@@ -42,44 +42,49 @@ class Config implements \ArrayAccess
     public function __construct($project, $config = null)
     {
         $this->config['path'] = rtrim($project, DIRECTORY_SEPARATOR);
-        $this->config['config_path'] = null;
-
-        if ($config !== null) {
-            $this->config['config_path'] = rtrim($config, DIRECTORY_SEPARATOR);
-            $this->config += $this->readConfig($config);
-        }
-
-        $this->config += $this->defaults;
-
-        // *always* exclude some folders - they're not project-specific code and
-        // could easily be overlooked when overriding excludes
-        $this->config['exclude_folders'][] = 'vendor';
-        $this->config['exclude_folders'][] = '.git';
-        $this->config['exclude_folders'][] = '.svn';
-        $this->config['exclude_folders'] = array_unique($this->config['exclude_folders']);
+        $this->config['config_path'] = $config ? rtrim($config, DIRECTORY_SEPARATOR) : null;
     }
 
     /**
-     * Normalize all relative paths by prefixing them with the project path.
-     *
-     * @param string|string[] $value
-     *
-     * @return string|string[]
+     * {@inheritdoc.
      */
-    protected function normalizePath($value)
+    public function offsetExists($offset)
     {
-        // array of paths = recursive
-        if (is_array($value)) {
-            foreach ($value as $i => $val) {
-                $value[$i] = $this->normalizePath($val);
-            }
+        return $this->offsetGet($offset) !== null;
+    }
 
-            return $value;
-        }
+    /**
+     * {@inheritdoc.
+     */
+    public function offsetGet($offset)
+    {
+        $path = $this->config['config_path'];
+        $config = $this->config + $this->readConfig($path) + $this->defaults;
 
-        $converter = new PathConverter(dirname($this->config['config_path']), $this->config['path']);
+        // *always* exclude some folders - they're not project-specific code and
+        // could easily be overlooked when overriding excludes
+        $config['exclude_folders'][] = 'vendor';
+        $config['exclude_folders'][] = '.git';
+        $config['exclude_folders'][] = '.svn';
+        $config['exclude_folders'] = array_unique($config['exclude_folders']);
 
-        return $converter->convert($value);
+        return isset($config[$offset]) ? $config[$offset] : null;
+    }
+
+    /**
+     * {@inheritdoc.
+     */
+    public function offsetSet($offset, $value)
+    {
+        throw new Exception('Can not set config.');
+    }
+
+    /**
+     * {@inheritdoc.
+     */
+    public function offsetUnset($offset)
+    {
+        throw new Exception('Can not unset config.');
     }
 
     /**
@@ -112,34 +117,25 @@ class Config implements \ArrayAccess
     }
 
     /**
-     * {@inheritdoc.
+     * Normalize all relative paths by prefixing them with the project path.
+     *
+     * @param string|string[] $value
+     *
+     * @return string|string[]
      */
-    public function offsetExists($offset)
+    protected function normalizePath($value)
     {
-        return array_key_exists($offset, $this->config);
-    }
+        // array of paths = recursive
+        if (is_array($value)) {
+            foreach ($value as $i => $val) {
+                $value[$i] = $this->normalizePath($val);
+            }
 
-    /**
-     * {@inheritdoc.
-     */
-    public function offsetGet($offset)
-    {
-        return $this->config[$offset];
-    }
+            return $value;
+        }
 
-    /**
-     * {@inheritdoc.
-     */
-    public function offsetSet($offset, $value)
-    {
-        $this->config[$offset] = $value;
-    }
+        $converter = new PathConverter(dirname($this->config['config_path']), $this->config['path']);
 
-    /**
-     * {@inheritdoc.
-     */
-    public function offsetUnset($offset)
-    {
-        unset($this->config[$offset]);
+        return $converter->convert($value);
     }
 }

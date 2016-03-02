@@ -9,6 +9,7 @@
 ### Changed
 - Do shallow clone when only last commit is needed
 - Don't copy entire repo for all, just stash code
+- Config adapts to changing config files
 
 
 ## [1.0.2] - 2016-02-29

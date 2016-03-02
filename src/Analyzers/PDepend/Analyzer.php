@@ -24,11 +24,6 @@ class Analyzer implements AnalyzerInterface
     protected $json = 'cauditor.json';
 
     /**
-     * @var string
-     */
-    protected $buildPath;
-
-    /**
      * @var Config
      */
     protected $config;
@@ -39,10 +34,6 @@ class Analyzer implements AnalyzerInterface
     public function __construct(Config $config)
     {
         $this->config = $config;
-
-        // all paths in build_path are relative to project root, which may not
-        // be where this code is run from, so prepend the project root!
-        $this->buildPath = $this->config['path'].DIRECTORY_SEPARATOR.$this->config['build_path'];
     }
 
     /**
@@ -52,18 +43,23 @@ class Analyzer implements AnalyzerInterface
      */
     public function execute()
     {
-        exec('mkdir -p '.$this->buildPath, $output, $result);
+        // all paths in build_path are relative to project root, which may not
+        // be where this code is run from, so prepend the project root!
+        $buildPath = $this->config['path'].DIRECTORY_SEPARATOR.$this->config['build_path'];
+
+        exec('mkdir -p '.$buildPath, $output, $result);
         if ($result !== 0) {
             throw new Exception('Unable to create build directory.');
         }
 
         // let pdepend generate all metrics we'll need
-        $this->pdepend();
+        $path = $buildPath.DIRECTORY_SEPARATOR.$this->json;
+        $this->pdepend($path);
 
         // if we expect these json files to be loaded client-side to render
         // the charts, might as well assume it'll fit in this machine's
         // memory to submit it to our API ;)
-        $json = file_get_contents($this->buildPath.DIRECTORY_SEPARATOR.$this->json);
+        $json = file_get_contents($path);
 
         return json_decode($json);
     }
@@ -71,12 +67,14 @@ class Analyzer implements AnalyzerInterface
     /**
      * Runs pdepend to generate the metrics.
      *
+     * @param string $path
+     *
      * @throws Exception
      */
-    protected function pdepend()
+    protected function pdepend($path)
     {
         $jsonGenerator = new JsonGenerator();
-        $jsonGenerator->setLogFile($this->buildPath.DIRECTORY_SEPARATOR.$this->json);
+        $jsonGenerator->setLogFile($path);
 
         $application = new Application();
         $engine = $application->getEngine();
