@@ -12,12 +12,18 @@ try {
         'h' => 'help',
         'p:' => 'path:',
         'r:' => 'repo:',
+        'b:' => 'branch:',
+        'c:' => 'commits:',
     ));
 
-    // check if there's a repo to import
-    $repo = isset($opts['repo']) ? $opts['repo'] : false;
+    if (isset($opts['help'])) {
+        $runner = new \Cauditor\Runners\Help();
+        $runner->execute();
+        exit(0);
+    }
 
-    // path to project (can be passed by param, or defaults to pwd
+    $repo = isset($opts['repo']) ? $opts['repo'] : false;
+    $branch = isset($opts['branch']) ? $opts['branch'] : false;
     $path = isset($opts['path']) ? $opts['path'] : false;
     $path = $path ?: getcwd();
 
@@ -35,12 +41,17 @@ try {
     $analyzer = new Cauditor\Analyzers\PDepend\Analyzer($config);
     $api = new \Cauditor\Api('https://www.cauditor.org');
 
-    if (isset($opts['help'])) {
-        $runner = new \Cauditor\Runners\Help();
-    } elseif (isset($opts['all'])) {
+    if (isset($opts['all'])) {
         $runner = new \Cauditor\Runners\All($config, $api, $analyzer);
+    } elseif (isset($opts['commits'])) {
+        $commits = explode(',', $opts['commits']);
+        $runner = new \Cauditor\Runners\Commits($config, $api, $analyzer, $commits);
     } else {
         $runner = new \Cauditor\Runners\Current($config, $api, $analyzer);
+    }
+
+    if (isset($opts['branch'])) {
+        $runner->setBranch($opts['branch']);
     }
 
     $runner->execute();
