@@ -13,12 +13,27 @@ use MatthiasMullie\CI\Factory as CIFactory;
  * @copyright Copyright (c) 2016, Matthias Mullie. All rights reserved.
  * @license LICENSE MIT
  */
-class All extends Current implements RunnerInterface
+class All implements RunnerInterface
 {
     /**
-     * @var string
+     * @var Config
      */
-    protected $slug;
+    protected $config;
+
+    /**
+     * @var Api
+     */
+    protected $api;
+
+    /**
+     * @var AnalyzerInterface
+     */
+    protected $analyzer;
+
+    /**
+     * @var bool
+     */
+    protected $stashed;
 
     /**
      * @var string
@@ -32,11 +47,50 @@ class All extends Current implements RunnerInterface
      */
     public function __construct(Config $config, Api $api, AnalyzerInterface $analyzer)
     {
-        parent::__construct($config, $api, $analyzer);
+        $this->config = $config;
+        $this->api = $api;
+        $this->analyzer = $analyzer;
 
-        // figure out current repo & branch
-        $this->slug = $this->getRepo();
-        $this->branch = $this->getDefaultBranch();
+        // lets make sure the code we're testing is this specific commit,
+        // without lingering uncommitted bits
+        $output = exec('git stash');
+        $this->stashed = $output === 'No local changes to save';
+
+        // store current branch
+        $environment = $this->getEnvironment();
+        $this->branch = $environment['branch'];
+
+        // move to default branch, which is likely the one we want to analyze
+        $this->setBranch($this->getDefaultBranch());
+    }
+
+    /**
+     * Restores the original environment after analyzing.
+     */
+    public function __destruct()
+    {
+        exec("git checkout $this->branch");
+        if ($this->stashed) {
+            exec('git stash pop');
+        }
+    }
+
+    /**
+     * @param string $branch
+     */
+    public function setBranch($branch)
+    {
+        exec("git checkout $branch && git reset --hard && git pull");
+    }
+
+    /**
+     * @return string[]
+     */
+    protected function getCommits()
+    {
+        exec("git log --pretty=format:'%H'", $commits);
+
+        return $commits;
     }
 
     /**
@@ -44,46 +98,50 @@ class All extends Current implements RunnerInterface
      */
     public function execute()
     {
-        // find build folder
-        $path = $this->config['path'];
-        $build = $path.DIRECTORY_SEPARATOR.$this->config['build_path'];
-
-        // don't want to mess with current repo; copy it to build folder instead
-        exec("rm -rf $build/repo && mkdir -p $build/repo && cp -r $path/.git $build/repo/.git");
-        chdir("$build/repo");
-
-        // checkout default branch & get list of all commits
-        exec("git checkout {$this->branch} && git reset --hard && git pull");
-        exec("git log --pretty=format:'%H'", $commits);
-
-        // compare with already imported commits & figure out which are missing
-        $imported = $this->getImportedCommits($this->slug, $this->branch);
+        // exclude commits that have already been imported
+        $commits = $this->getCommits();
+        $imported = $this->getImportedCommits();
         $missing = array_diff($commits, $imported);
-
-        // now analyze all missing commits
         foreach ($missing as $commit) {
             exec("git reset $commit --hard");
 
-            $config = new Config(getcwd(), getcwd().DIRECTORY_SEPARATOR.'.cauditor.yml');
-            $this->analyzer->setConfig($config);
+            $metrics = $this->analyzer->execute();
+            $data = array('metrics' => $metrics) + $this->getEnvironment();
 
-            parent::execute();
+            // submit to cauditor (note that branch can be empty for PRs)
+            $uri = "/api/v1/{$data['slug']}/{$data['branch']}/{$data['commit']}";
+            $uri = preg_replace('/(?<!:)\/+/', '/', $uri);
+            $result = $this->api->put($uri, $data);
+
+            if ($result !== false) {
+                echo "Submitted metrics for {$data['commit']} @ {$data['slug']} {$data['branch']}\n";
+            } else {
+                echo "Failed to submit metrics for {$data['commit']} @ {$data['slug']} {$data['branch']}\n";
+            }
         }
 
-        // cleanup
-        chdir('../..');
-        exec("rm -rf $build/repo");
+        echo "Done!\n";
     }
 
     /**
-     * @return string
+     * Returns array of commit hashes that have already been imported.
+     *
+     * @return string[]
+     *
+     * @throws Exception
      */
-    protected function getRepo()
+    protected function getImportedCommits()
     {
-        $factory = new CIFactory();
-        $ci = $factory->getCurrent();
+        $environment = $this->getEnvironment();
+        $slug = $environment['slug'];
+        $branch = $environment['branch'];
 
-        return $ci->getSlug();
+        $imported = $this->api->get("/api/v1/$slug/$branch");
+        if ($imported === false) {
+            throw new Exception('Failed to reach API.');
+        }
+
+        return json_decode($imported);
     }
 
     /**
@@ -98,20 +156,23 @@ class All extends Current implements RunnerInterface
     }
 
     /**
-     * @param string $slug
-     * @param string $branch
-     *
-     * @return string[]
-     *
-     * @throws Exception
+     * @return array
      */
-    protected function getImportedCommits($slug, $branch)
+    protected function getEnvironment()
     {
-        $imported = $this->api->get("/api/v1/$slug/$branch");
-        if ($imported === false) {
-            throw new Exception('Failed to reach API.');
-        }
+        // get build data from CI
+        $factory = new CIFactory();
+        $environment = $factory->getCurrent();
 
-        return json_decode($imported);
+        return array(
+            'repo' => $environment->getRepo(),
+            'slug' => $environment->getSlug(),
+            'branch' => $environment->getBranch(),
+            'pull-request' => $environment->getPullRequest(),
+            'commit' => $environment->getCommit(),
+            'previous-commit' => $environment->getPreviousCommit(),
+            'author-email' => $environment->getAuthorEmail(),
+            'timestamp' => $environment->getTimestamp(),
+        );
     }
 }
