@@ -38,14 +38,6 @@ class Analyzer implements AnalyzerInterface
      */
     public function __construct(Config $config)
     {
-        $this->setConfig($config);
-    }
-
-    /**
-     * @param Config $config
-     */
-    public function setConfig(Config $config)
-    {
         $this->config = $config;
 
         // all paths in build_path are relative to project root, which may not

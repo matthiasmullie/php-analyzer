@@ -2,7 +2,6 @@
 
 namespace Cauditor\Analyzers;
 
-use Cauditor\Config;
 use Cauditor\Exception;
 
 /**
@@ -12,11 +11,6 @@ use Cauditor\Exception;
  */
 interface AnalyzerInterface
 {
-    /**
-     * @param Config $config
-     */
-    public function setConfig(Config $config);
-
     /**
      * @return array
      *
