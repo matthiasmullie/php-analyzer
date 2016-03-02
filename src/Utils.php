@@ -28,9 +28,9 @@ class Utils
             $long = trim($long, ':');
 
             if (isset($opts[$short])) {
-                $input[$long] = $opts[$short];
+                $result[$long] = $opts[$short];
             } elseif (isset($opts[$long])) {
-                $input[$long] = $opts[$long];
+                $result[$long] = $opts[$long];
             }
         }
 
