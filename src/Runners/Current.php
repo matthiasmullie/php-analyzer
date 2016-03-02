@@ -47,6 +47,11 @@ class Current implements RunnerInterface
      */
     public function execute()
     {
+        $output = exec('git stash', $o, $e);
+        var_dump($output);
+        var_dump($e);
+        exit();
+
         $metrics = $this->analyzer->execute();
 
         $data = array('metrics' => $metrics) + $this->getEnvironment();
