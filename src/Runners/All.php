@@ -54,7 +54,7 @@ class All implements RunnerInterface
         // lets make sure the code we're testing is this specific commit,
         // without lingering uncommitted bits
         $output = exec('git stash');
-        $this->stashed = $output === 'No local changes to save';
+        $this->stashed = $output !== 'No local changes to save';
 
         // store current branch
         $environment = $this->getEnvironment();
