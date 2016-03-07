@@ -28,11 +28,11 @@ try {
     $path = $path ?: getcwd();
 
     if ($repo !== false) {
-        if (isset($opts['all'])) {
-            exec("git clone $repo $path");
-        } else {
+        if (!isset($opts['all']) && !isset($opts['commits'])) {
             // need a depth of 2 to get hash of previous commit
             exec("git clone --depth=2 $repo $path");
+        } else {
+            exec("git clone $repo $path");
         }
     }
     chdir("$path");
