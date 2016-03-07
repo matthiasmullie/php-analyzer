@@ -31,7 +31,8 @@ try {
         if (isset($opts['all'])) {
             exec("git clone $repo $path");
         } else {
-            exec("git clone --depth=1 $repo $path");
+            // need a depth of 2 to get hash of previous commit
+            exec("git clone --depth=2 $repo $path");
         }
     }
     chdir("$path");
