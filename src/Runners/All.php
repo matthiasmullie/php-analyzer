@@ -98,7 +98,10 @@ class All implements RunnerInterface
             exec("git reset $commit --hard");
 
             $metrics = $this->analyzer->execute();
-            $data = array('metrics' => $metrics) + $this->getEnvironment();
+            $data = array(
+                'default-branch' => $this->getDefaultBranch(),
+                'metrics' => $metrics
+            ) + $this->getEnvironment();
 
             // submit to cauditor (note that branch can be empty for PRs)
             $uri = "/api/v1/{$data['slug']}/{$data['branch']}/{$data['commit']}";
@@ -171,7 +174,6 @@ class All implements RunnerInterface
             'previous-commit' => $environment->getPreviousCommit(),
             'author-email' => $environment->getAuthorEmail(),
             'timestamp' => $environment->getTimestamp(),
-            'default-branch' => $this->getDefaultBranch(),
         );
     }
 }
