@@ -1,6 +1,14 @@
 # Changelog
 
 
+## [1.2.0] - 2016-03-13
+### Added
+- Submits default branch
+
+### Changed
+- Extract commit hashes from (changed) API response
+
+
 ## [1.1.1] - 2016-03-07
 ### Fixed
 - Fix previous commit hash for latest commit
@@ -45,3 +53,4 @@
 [1.0.2]: https://github.com/cauditor/php-analyzer/compare/1.0.1...1.0.2
 [1.1.0]: https://github.com/cauditor/php-analyzer/compare/1.0.2...1.1.0
 [1.1.1]: https://github.com/cauditor/php-analyzer/compare/1.1.0...1.1.1
+[1.2.0]: https://github.com/cauditor/php-analyzer/compare/1.1.1...1.2.0
