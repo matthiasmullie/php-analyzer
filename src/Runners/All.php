@@ -133,7 +133,13 @@ class All implements RunnerInterface
             throw new Exception('Failed to reach API.');
         }
 
-        return json_decode($imported);
+        $commits = json_decode($imported);
+        $hashes = array();
+        foreach ($commits as $commit) {
+            $hashes[] = $commit['hash'];
+        }
+
+        return $hashes;
     }
 
     /**
