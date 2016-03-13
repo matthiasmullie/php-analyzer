@@ -4,7 +4,6 @@ namespace Cauditor\Runners;
 
 use Cauditor\Analyzers\AnalyzerInterface;
 use Cauditor\Api;
-use Cauditor\Config;
 use Cauditor\Exception;
 use MatthiasMullie\CI\Factory as CIFactory;
 
@@ -166,6 +165,7 @@ class All implements RunnerInterface
             'previous-commit' => $environment->getPreviousCommit(),
             'author-email' => $environment->getAuthorEmail(),
             'timestamp' => $environment->getTimestamp(),
+            'default-branch' => $this->getDefaultBranch(),
         );
     }
 }
