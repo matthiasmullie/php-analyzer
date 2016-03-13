@@ -1,6 +1,12 @@
 # Changelog
 
 
+## [1.1.1] - 2016-03-07
+### Fixed
+- Fix previous commit hash for latest commit
+- When analyzing specific commits, do full clone
+
+
 ## [1.1.0] - 2016-03-02
 ### Added
 - Allows analyzing specific branch
@@ -38,3 +44,4 @@
 [1.0.1]: https://github.com/cauditor/php-analyzer/compare/1.0.0...1.0.1
 [1.0.2]: https://github.com/cauditor/php-analyzer/compare/1.0.1...1.0.2
 [1.1.0]: https://github.com/cauditor/php-analyzer/compare/1.0.2...1.1.0
+[1.1.1]: https://github.com/cauditor/php-analyzer/compare/1.1.0...1.1.1
