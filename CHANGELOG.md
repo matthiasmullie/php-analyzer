@@ -4,6 +4,7 @@
 ## [1.2.0] - 2016-03-15
 ### Added
 - Submits default branch
+- Submits average, min & max metrics
 
 ### Changed
 - Extract commit hashes from (changed) API response
