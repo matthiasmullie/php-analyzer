@@ -46,30 +46,32 @@ class JsonGenerator extends AbstractASTVisitor implements CodeAwareGenerator, Fi
     protected $data = array();
 
     /**
-     * Project-wide totals for all node analyzers.
-     *
-     * @var array
-     */
-    protected $projectMetrics = array();
-
-    /**
      * List of metrics to include and what to map them to.
      *
-     * @var string[]
+     * @var string[][]
      */
     protected $metrics = array(
-        'eloc' => 'loc',
-        'noc' => 'noc',
-        'nom' => 'nom',
-        'ca' => 'ca',
-        'ce' => 'ce',
-        'i' => 'i',
-        'dit' => 'dit',
-        'ccn2' => 'ccn',
-        'npath' => 'npath',
-        'he' => 'he',
-        'hi' => 'hi',
-        'mi' => 'mi',
+        'project' => array(
+            'eloc' => 'loc',
+            'noc' => 'noc',
+            'nom' => 'nom',
+        ),
+        'namespace' => array(
+            // nothing
+        ),
+        'class' => array(
+            'ca' => 'ca',
+            'ce' => 'ce',
+            'i' => 'i',
+            'dit' => 'dit',
+        ),
+        'function' => array(
+            'ccn2' => 'ccn',
+            'npath' => 'npath',
+            'he' => 'he',
+            'hi' => 'hi',
+            'mi' => 'mi',
+        ),
     );
 
     /**
@@ -102,11 +104,7 @@ class JsonGenerator extends AbstractASTVisitor implements CodeAwareGenerator, Fi
             $artifact->accept($this);
         }
 
-        $data = $this->getProjectMetrics() + $this->projectMetrics;
-        // include stability; not to average over all classes, but the total of
-        // all class stabilities
-        $data = $this->addInstability($data);
-        $data['i'] = (float) number_format($data['i'] * $data['noc'], 2, '.', '');
+        $data = $this->getProjectMetrics();
         $data += array('children' => $this->data);
 
         $json = json_encode($data);
@@ -153,7 +151,7 @@ class JsonGenerator extends AbstractASTVisitor implements CodeAwareGenerator, Fi
     {
         $data = array();
         $data['name'] = $node->getName();
-        $data += $this->getNodeMetrics($node);
+        $data += $this->getNodeMetrics($node, 'namespace');
         $data['children'] = array();
 
         $this->data[] = $data;
@@ -200,7 +198,7 @@ class JsonGenerator extends AbstractASTVisitor implements CodeAwareGenerator, Fi
     {
         $data = array();
         $data['name'] = $node->getName();
-        $data += $this->getNodeMetrics($node);
+        $data += $this->getNodeMetrics($node, 'class');
         $data['children'] = array();
 
         $namespace = count($this->data) - 1;
@@ -219,7 +217,7 @@ class JsonGenerator extends AbstractASTVisitor implements CodeAwareGenerator, Fi
     {
         $data = array();
         $data['name'] = $node->getName();
-        $data += $this->getNodeMetrics($node);
+        $data += $this->getNodeMetrics($node, 'function');
 
         $namespace = count($this->data) - 1;
         $this->data[$namespace]['children'][] = $data;
@@ -232,7 +230,7 @@ class JsonGenerator extends AbstractASTVisitor implements CodeAwareGenerator, Fi
     {
         $data = array();
         $data['name'] = $node->getName();
-        $data += $this->getNodeMetrics($node);
+        $data += $this->getNodeMetrics($node, 'function');
 
         $namespace = count($this->data) - 1;
         $class = count($this->data[$namespace]['children']) - 1;
@@ -249,45 +247,36 @@ class JsonGenerator extends AbstractASTVisitor implements CodeAwareGenerator, Fi
             $metrics += $analyzer->getProjectMetrics();
         }
 
-        return $this->normalizeMetrics($metrics);
+        return $this->normalizeMetrics($metrics, 'project');
     }
 
     /**
      * @param ASTArtifact $node
+     * @param string $type
      *
      * @return int[]
      */
-    protected function getNodeMetrics(ASTArtifact $node)
+    protected function getNodeMetrics(ASTArtifact $node, $type)
     {
         $metrics = array();
         foreach ($this->nodeAnalyzers as $analyzer) {
             $metrics += $analyzer->getNodeMetrics($node);
         }
 
-        $metrics = $this->normalizeMetrics($metrics);
-
-        // add node metric to project-wide totals
-        foreach ($metrics as $metric => $value) {
-            if (!isset($this->projectMetrics[$metric])) {
-                $this->projectMetrics[$metric] = 0;
-            }
-
-            $this->projectMetrics[$metric] += $value;
-        }
-
-        return $metrics;
+        return $this->normalizeMetrics($metrics, $type);
     }
 
     /**
      * @param array $metrics
+     * @param string $type
      *
      * @return array
      */
-    protected function normalizeMetrics(array $metrics)
+    protected function normalizeMetrics(array $metrics, $type)
     {
         $result = array();
 
-        foreach ($this->metrics as $metric => $replacement) {
+        foreach ($this->metrics[$type] as $metric => $replacement) {
             if (isset($metrics[$metric])) {
                 $result[$replacement] = $metrics[$metric];
             }
