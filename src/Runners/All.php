@@ -101,7 +101,7 @@ class All implements RunnerInterface
             $avg = $min = $max = array();
             $flat = $this->flatten($metrics);
             foreach ($flat as $metric => $values) {
-                $avg[$metric] = array_sum($values) / count($values);
+                $avg[$metric] = (float) number_format(array_sum($values) / count($values), 2, '.', '');
                 $min[$metric] = min($values);
                 $max[$metric] = max($values);
             }
