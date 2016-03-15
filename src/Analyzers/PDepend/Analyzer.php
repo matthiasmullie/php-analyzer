@@ -37,9 +37,7 @@ class Analyzer implements AnalyzerInterface
     }
 
     /**
-     * @return array
-     *
-     * @throws Exception
+     * {@inheritdoc}
      */
     public function execute()
     {
@@ -61,7 +59,7 @@ class Analyzer implements AnalyzerInterface
         // memory to submit it to our API ;)
         $json = file_get_contents($path);
 
-        return json_decode($json);
+        return json_decode($json, true);
     }
 
     /**
