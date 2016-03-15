@@ -60,12 +60,14 @@ class JsonGenerator extends AbstractASTVisitor implements CodeAwareGenerator, Fi
             // nothing
         ),
         'class' => array(
+            'eloc' => 'loc',
             'ca' => 'ca',
             'ce' => 'ce',
             'i' => 'i',
             'dit' => 'dit',
         ),
         'function' => array(
+            'eloc' => 'loc',
             'ccn2' => 'ccn',
             'npath' => 'npath',
             'he' => 'he',
