@@ -1,12 +1,15 @@
 # Changelog
 
 
-## [1.2.0] - 2016-03-13
+## [1.2.0] - 2016-03-15
 ### Added
 - Submits default branch
 
 ### Changed
 - Extract commit hashes from (changed) API response
+
+### Fixed
+- Project-wide instability is now sum, like all other metrics
 
 
 ## [1.1.1] - 2016-03-07

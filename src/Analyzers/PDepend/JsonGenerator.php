@@ -103,7 +103,10 @@ class JsonGenerator extends AbstractASTVisitor implements CodeAwareGenerator, Fi
         }
 
         $data = $this->getProjectMetrics() + $this->projectMetrics;
+        // include stability; not to average over all classes, but the total of
+        // all class stabilities
         $data = $this->addInstability($data);
+        $data['i'] = (float) number_format($data['i'] * $data['noc'], 2, '.', '');
         $data += array('children' => $this->data);
 
         $json = json_encode($data);
@@ -290,6 +293,8 @@ class JsonGenerator extends AbstractASTVisitor implements CodeAwareGenerator, Fi
             }
         }
 
+        $result = $this->addInstability($result);
+
         foreach ($result as $metric => $value) {
             if (is_float($value)) {
                 $result[$metric] = number_format($value, 2, '.', '');
@@ -300,14 +305,12 @@ class JsonGenerator extends AbstractASTVisitor implements CodeAwareGenerator, Fi
             $result[$metric] = (float) $result[$metric];
         }
 
-        $result = $this->addInstability($result);
-
         return $result;
     }
 
     /**
      * pdepend.analyzer.dependency also calculates instability, but not on a
-     * per-class level, and defauling to 0 instead of 1.
+     * per-class level, and defaulting to 0 instead of 1.
      *
      * @param array $metrics
      *
@@ -316,7 +319,7 @@ class JsonGenerator extends AbstractASTVisitor implements CodeAwareGenerator, Fi
     protected function addInstability(array $metrics)
     {
         if (isset($metrics['ca']) && isset($metrics['ce'])) {
-            $metrics['i'] = (float) number_format($metrics['ce'] / (($metrics['ce'] + $metrics['ca']) ?: 1), 2);
+            $metrics['i'] = $metrics['ce'] / (($metrics['ce'] + $metrics['ca']) ?: 1);
         }
 
         return $metrics;
