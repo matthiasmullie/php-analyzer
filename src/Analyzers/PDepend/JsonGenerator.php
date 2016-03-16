@@ -254,7 +254,7 @@ class JsonGenerator extends AbstractASTVisitor implements CodeAwareGenerator, Fi
 
     /**
      * @param ASTArtifact $node
-     * @param string $type
+     * @param string      $type
      *
      * @return int[]
      */
@@ -269,7 +269,7 @@ class JsonGenerator extends AbstractASTVisitor implements CodeAwareGenerator, Fi
     }
 
     /**
-     * @param array $metrics
+     * @param array  $metrics
      * @param string $type
      *
      * @return array

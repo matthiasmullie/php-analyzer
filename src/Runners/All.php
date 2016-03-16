@@ -189,9 +189,10 @@ class All implements RunnerInterface
     }
 
     /**
-     * Flatten metrics into [metric => [value1, value1, value3]] array
+     * Flatten metrics into [metric => [value1, value1, value3]] array.
      *
      * @param array $metrics
+     *
      * @return float[][]
      */
     protected function flatten(array $metrics)

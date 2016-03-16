@@ -4,7 +4,6 @@ namespace Cauditor\Runners;
 
 use Cauditor\Analyzers\AnalyzerInterface;
 use Cauditor\Api;
-use Cauditor\Config;
 
 /**
  * @author Matthias Mullie <cauditor@mullie.eu>
