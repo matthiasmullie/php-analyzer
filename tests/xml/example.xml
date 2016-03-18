@@ -1,8 +1,0 @@
-<root>
-    <parent attr="first">
-        <child attr="first"></child>
-    </parent>
-    <parent attr="second">
-        <child attr="second"></child>
-    </parent>
-</root>
