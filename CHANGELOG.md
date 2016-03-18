@@ -1,6 +1,11 @@
 # Changelog
 
 
+## [1.2.1] - 2016-03-18
+### Added
+- Submits 'noc'
+
+
 ## [1.2.0] - 2016-03-15
 ### Added
 - Submits default branch
@@ -58,3 +63,4 @@
 [1.1.0]: https://github.com/cauditor/php-analyzer/compare/1.0.2...1.1.0
 [1.1.1]: https://github.com/cauditor/php-analyzer/compare/1.1.0...1.1.1
 [1.2.0]: https://github.com/cauditor/php-analyzer/compare/1.1.1...1.2.0
+[1.2.1]: https://github.com/cauditor/php-analyzer/compare/1.2.0...1.2.1

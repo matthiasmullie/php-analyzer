@@ -55,6 +55,7 @@ class JsonGenerator extends AbstractASTVisitor implements CodeAwareGenerator, Fi
             'eloc' => 'loc',
             'noc' => 'noc',
             'nom' => 'nom',
+            'nof' => 'nof',
         ),
         'namespace' => array(
             // nothing
