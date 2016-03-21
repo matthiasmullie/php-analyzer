@@ -97,7 +97,15 @@ class All implements RunnerInterface
         foreach ($missing as $commit) {
             exec("git reset $commit --hard");
 
-            $metrics = $this->analyzer->execute();
+            do {
+                try {
+                    $metrics = $this->analyzer->execute();
+                    break;
+                } catch(Exception $e) {
+                    // keep trying...
+                }
+            } while(true);
+
             $avg = $min = $max = array();
             $flat = $this->flatten($metrics);
             foreach ($flat as $metric => $values) {
