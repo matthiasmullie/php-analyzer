@@ -51,8 +51,10 @@ class Analyzer implements AnalyzerInterface
         }
 
         // let pdepend generate all metrics we'll need
+        set_error_handler(array($this, 'warningHandler'), E_WARNING);
         $path = $buildPath.DIRECTORY_SEPARATOR.$this->json;
         $this->pdepend($path);
+        restore_error_handler();
 
         // if we expect these json files to be loaded client-side to render
         // the charts, might as well assume it'll fit in this machine's
@@ -92,5 +94,24 @@ class Analyzer implements AnalyzerInterface
         } catch (\Exception $e) {
             throw new Exception('Unable to generate pdepend metrics.');
         }
+    }
+
+    /**
+     * @param int $errno
+     * @param string $errstr
+     * @param string $errfile
+     * @param string $errline
+     * @param array $errcontext
+     * @throws Exception
+     */
+    protected function warningHandler($errno, $errstr, $errfile, $errline, array $errcontext) {
+        if (
+            strpos($errstr, 'filesize(): stat failed') !== false &&
+            strpos($errfile, 'FileCacheDriver.php') !== false
+        ) {
+            throw new Exception('Failed to load from cache; risk potentially incomplete metrics.');
+        }
+
+        return;
     }
 }
