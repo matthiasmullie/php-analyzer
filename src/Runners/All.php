@@ -101,10 +101,10 @@ class All implements RunnerInterface
                 try {
                     $metrics = $this->analyzer->execute();
                     break;
-                } catch(Exception $e) {
+                } catch (Exception $e) {
                     // keep trying...
                 }
-            } while(true);
+            } while (true);
 
             $avg = $min = $max = array();
             $flat = $this->flatten($metrics);

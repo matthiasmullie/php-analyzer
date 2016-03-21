@@ -97,14 +97,16 @@ class Analyzer implements AnalyzerInterface
     }
 
     /**
-     * @param int $errno
+     * @param int    $errno
      * @param string $errstr
      * @param string $errfile
      * @param string $errline
-     * @param array $errcontext
+     * @param array  $errcontext
+     *
      * @throws Exception
      */
-    protected function warningHandler($errno, $errstr, $errfile, $errline, array $errcontext) {
+    protected function warningHandler($errno, $errstr, $errfile, $errline, array $errcontext)
+    {
         if (
             strpos($errstr, 'filesize(): stat failed') !== false &&
             strpos($errfile, 'FileCacheDriver.php') !== false
