@@ -1,6 +1,12 @@
 # Changelog
 
 
+## [1.2.2] - 2016-03-21
+### Added
+- Fail when we risk incomplete data
+- Keep retrying on analyze fail
+
+
 ## [1.2.1] - 2016-03-18
 ### Added
 - Submits 'noc'
@@ -64,3 +70,4 @@
 [1.1.1]: https://github.com/cauditor/php-analyzer/compare/1.1.0...1.1.1
 [1.2.0]: https://github.com/cauditor/php-analyzer/compare/1.1.1...1.2.0
 [1.2.1]: https://github.com/cauditor/php-analyzer/compare/1.2.0...1.2.1
+[1.2.2]: https://github.com/cauditor/php-analyzer/compare/1.2.1...1.2.2
