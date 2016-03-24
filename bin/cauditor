@@ -14,6 +14,7 @@ try {
         'r:' => 'repo:',
         'b:' => 'branch:',
         'c:' => 'commits:',
+        't:' => 'target:',
     ));
 
     if (isset($opts['help'])) {
@@ -22,6 +23,7 @@ try {
         exit(0);
     }
 
+    $target = isset($opts['target']) ? $opts['target'] : 'https://www.cauditor.org';
     $repo = isset($opts['repo']) ? $opts['repo'] : false;
     $branch = isset($opts['branch']) ? $opts['branch'] : false;
     $path = isset($opts['path']) ? $opts['path'] : false;
@@ -40,7 +42,7 @@ try {
     // bootstrap
     $config = new Cauditor\Config($path, $path.DIRECTORY_SEPARATOR.'.cauditor.yml');
     $analyzer = new Cauditor\Analyzers\PDepend\Analyzer($config);
-    $api = new \Cauditor\Api('https://www.cauditor.org');
+    $api = new \Cauditor\Api($target);
 
     if (isset($opts['all'])) {
         $runner = new \Cauditor\Runners\All($api, $analyzer);

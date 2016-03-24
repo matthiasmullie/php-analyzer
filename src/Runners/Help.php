@@ -20,6 +20,7 @@ class Help implements RunnerInterface
             "  -b|--branch=<branch>  Analyze a specific branch.\n",
             "  -p|--path=<dir>       Analyze a specific directory.\n\n",
             "Miscellaneous:\n\n",
+            "  -t|--target           Cauditor API to push to.\n",
             "  -h|--help             Prints this help message.\n";
     }
 }

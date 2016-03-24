@@ -3,6 +3,9 @@
 
 ## [1.2.3] - 2016-03-24
 ### Added
+- Allow supplying different API target (e.g. http instead of https)
+
+### Changed
 - Clarify success & error output
 
 
@@ -76,3 +79,4 @@
 [1.2.0]: https://github.com/cauditor/php-analyzer/compare/1.1.1...1.2.0
 [1.2.1]: https://github.com/cauditor/php-analyzer/compare/1.2.0...1.2.1
 [1.2.2]: https://github.com/cauditor/php-analyzer/compare/1.2.1...1.2.2
+[1.2.3]: https://github.com/cauditor/php-analyzer/compare/1.2.2...1.2.3
