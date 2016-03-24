@@ -1,6 +1,11 @@
 # Changelog
 
 
+## [1.2.3] - 2016-03-24
+### Added
+- Clarify success & error output
+
+
 ## [1.2.2] - 2016-03-21
 ### Added
 - Fail when we risk incomplete data

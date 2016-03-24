@@ -12,14 +12,22 @@ class Api
     /**
      * @var string
      */
-    protected $api;
+    protected $domain;
 
     /**
-     * @param string $api
+     * @param string $domain
      */
-    public function __construct($api)
+    public function __construct($domain)
     {
-        $this->api = $api;
+        $this->domain = rtrim($domain, '/');
+    }
+
+    /**
+     * @return string
+     */
+    public function getDomain()
+    {
+        return $this->domain;
     }
 
     /**
@@ -32,7 +40,7 @@ class Api
     public function get($uri)
     {
         $options = array(
-            CURLOPT_URL => $this->api.$uri,
+            CURLOPT_URL => $this->domain.'/'.ltrim($uri, '/'),
             CURLOPT_FOLLOWLOCATION => 1,
             CURLOPT_RETURNTRANSFER => 1,
         );
@@ -58,7 +66,7 @@ class Api
         fseek($file, 0);
 
         $options = array(
-            CURLOPT_URL => $this->api.$uri,
+            CURLOPT_URL => $this->domain.'/'.ltrim($uri, '/'),
             CURLOPT_FOLLOWLOCATION => 1,
             CURLOPT_RETURNTRANSFER => 1,
             CURLOPT_PUT => 1,

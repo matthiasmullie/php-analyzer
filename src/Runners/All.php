@@ -127,10 +127,16 @@ class All implements RunnerInterface
             $uri = preg_replace('/(?<!:)\/+/', '/', $uri);
             $result = $this->api->put($uri, $data);
 
+            $domain = $this->api->getDomain();
             if ($result !== false) {
-                echo "Submitted metrics for {$data['commit']} @ {$data['slug']} {$data['branch']}\n";
+                $result = json_decode($result, true);
+                if (isset($result['error'])) {
+                    echo "Failed to submit metrics to {$domain}/{$data['slug']}/{$data['commit']}/metrics: {$result['error']}\n";
+                } else {
+                    echo "Submitted metrics to {$domain}/{$data['slug']}/{$data['commit']}/metrics\n";
+                }
             } else {
-                echo "Failed to submit metrics for {$data['commit']} @ {$data['slug']} {$data['branch']}\n";
+                echo "Failed to submit metrics to {$domain}/{$data['slug']}/{$data['commit']}/metrics\n";
             }
         }
 
