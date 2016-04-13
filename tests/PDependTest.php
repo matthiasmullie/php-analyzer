@@ -12,7 +12,7 @@ class PDependTest extends PHPUnit_Framework_TestCase
     {
         $path = __DIR__.'/../vendor/matthiasmullie/php-skeleton';
         $config = __DIR__.'/analyze/php-skeleton.yml';
-        $expect = file_get_contents(__DIR__.'/build/cauditor.json');
+        $expect = file_get_contents(__DIR__.'/build/php-skeleton.json');
 
         $config = new Config($path, $config);
         $analyzer = new PDependAnalyzer($config);

@@ -280,9 +280,7 @@ class JsonGenerator extends AbstractASTVisitor implements CodeAwareGenerator, Fi
         $result = array();
 
         foreach ($this->metrics[$type] as $metric => $replacement) {
-            if (isset($metrics[$metric])) {
-                $result[$replacement] = $metrics[$metric];
-            }
+            $result[$replacement] = isset($metrics[$metric]) ? $metrics[$metric] : 0;
         }
 
         $result = $this->addInstability($result);

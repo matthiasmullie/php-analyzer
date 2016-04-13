@@ -2,6 +2,7 @@
 
 namespace Cauditor\Runners;
 
+use Cauditor\Aggregator;
 use Cauditor\Analyzers\AnalyzerInterface;
 use Cauditor\Api;
 use Cauditor\Exception;
@@ -106,20 +107,14 @@ class All implements RunnerInterface
                 }
             } while (true);
 
-            $avg = $min = $max = array();
-            $flat = $this->flatten($metrics);
-            foreach ($flat as $metric => $values) {
-                $avg[$metric] = (float) number_format(array_sum($values) / count($values), 2, '.', '');
-                $min[$metric] = min($values);
-                $max[$metric] = max($values);
-            }
-
+            $aggregator = new Aggregator($metrics);
             $data = array(
                 'default-branch' => $this->getDefaultBranch(),
                 'metrics' => $metrics,
-                'avg' => $avg,
-                'min' => $min,
-                'max' => $max,
+                'avg' => $aggregator->average(),
+                'min' => $aggregator->min(),
+                'max' => $aggregator->max(),
+                'weighed' => $aggregator->weigh(),
             ) + $this->getEnvironment();
 
             // submit to cauditor (note that branch can be empty for PRs)
@@ -200,34 +195,5 @@ class All implements RunnerInterface
             'author-email' => $environment->getAuthorEmail(),
             'timestamp' => $environment->getTimestamp(),
         );
-    }
-
-    /**
-     * Flatten metrics into [metric => [value1, value1, value3]] array.
-     *
-     * @param array $metrics
-     *
-     * @return float[][]
-     */
-    protected function flatten(array $metrics)
-    {
-        $flat = array();
-        $metrics = (array) $metrics;
-
-        foreach ($metrics as $metric => $value) {
-            // name & children are meta data, not metrics
-            if (!in_array($metric, array('name', 'children'))) {
-                $flat[$metric][] = $value;
-            }
-        }
-
-        if (isset($metrics['children'])) {
-            foreach ($metrics['children'] as $child) {
-                $childTotals = $this->flatten($child);
-                $flat = array_merge_recursive($flat, $childTotals);
-            }
-        }
-
-        return $flat;
     }
 }
