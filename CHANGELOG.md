@@ -1,6 +1,11 @@
 # Changelog
 
 
+## [1.2.5] - 2016-04-14
+### Added
+- Ensure file cache with separate locations per build
+
+
 ## [1.2.4] - 2016-04-13
 ### Added
 - Submit weighed averages
@@ -86,3 +91,4 @@
 [1.2.2]: https://github.com/cauditor/php-analyzer/compare/1.2.1...1.2.2
 [1.2.3]: https://github.com/cauditor/php-analyzer/compare/1.2.2...1.2.3
 [1.2.4]: https://github.com/cauditor/php-analyzer/compare/1.2.3...1.2.4
+[1.2.5]: https://github.com/cauditor/php-analyzer/compare/1.2.4...1.2.5

@@ -52,7 +52,7 @@ class Analyzer implements AnalyzerInterface
 
         // let pdepend generate all metrics we'll need
         set_error_handler(array($this, 'warningHandler'), E_WARNING);
-        $path = $buildPath.DIRECTORY_SEPARATOR.$this->json;
+        $path = $buildPath;
         $this->pdepend($path);
         restore_error_handler();
 
@@ -74,9 +74,16 @@ class Analyzer implements AnalyzerInterface
     protected function pdepend($path)
     {
         $jsonGenerator = new JsonGenerator();
-        $jsonGenerator->setLogFile($path);
+        $jsonGenerator->setLogFile($path.DIRECTORY_SEPARATOR.$this->json);
 
         $application = new Application();
+
+        // overwrite default config to ensure that cache files are stored in
+        // different folders per build
+        $config = $application->getConfiguration();
+        $config->cache->driver = 'file';
+        $config->cache->location = $path.DIRECTORY_SEPARATOR.'.pdepend';
+
         $engine = $application->getEngine();
         $engine->addReportGenerator($jsonGenerator);
 
