@@ -24,6 +24,13 @@ class Analyzer implements AnalyzerInterface
     protected $json = 'cauditor.json';
 
     /**
+     * PDepend cache directory name.
+     *
+     * @var string
+     */
+    protected $pdepend = '.pdepend';
+
+    /**
      * @var Config
      */
     protected $config;
@@ -45,7 +52,7 @@ class Analyzer implements AnalyzerInterface
         // be where this code is run from, so prepend the project root!
         $buildPath = $this->config['path'].DIRECTORY_SEPARATOR.$this->config['build_path'];
 
-        exec('mkdir -p '.$buildPath, $output, $result);
+        exec('mkdir -p '.$buildPath.DIRECTORY_SEPARATOR.$this->pdepend, $output, $result);
         if ($result !== 0) {
             throw new Exception('Unable to create build directory.');
         }
@@ -59,7 +66,7 @@ class Analyzer implements AnalyzerInterface
         // if we expect these json files to be loaded client-side to render
         // the charts, might as well assume it'll fit in this machine's
         // memory to submit it to our API ;)
-        $json = file_get_contents($path);
+        $json = file_get_contents($path.DIRECTORY_SEPARATOR.$this->json);
 
         return json_decode($json, true);
     }
@@ -82,7 +89,7 @@ class Analyzer implements AnalyzerInterface
         // different folders per build
         $config = $application->getConfiguration();
         $config->cache->driver = 'file';
-        $config->cache->location = $path.DIRECTORY_SEPARATOR.'.pdepend';
+        $config->cache->location = $path.DIRECTORY_SEPARATOR.$this->pdepend;
 
         $engine = $application->getEngine();
         $engine->addReportGenerator($jsonGenerator);
