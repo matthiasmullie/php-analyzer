@@ -66,6 +66,7 @@ class Config implements \ArrayAccess
         $config['exclude_folders'][] = 'vendor';
         $config['exclude_folders'][] = '.git';
         $config['exclude_folders'][] = '.svn';
+        $config['exclude_folders'][] = $config['build_path'];
         $config['exclude_folders'] = array_unique($config['exclude_folders']);
 
         return isset($config[$offset]) ? $config[$offset] : null;

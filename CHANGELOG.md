@@ -1,8 +1,13 @@
 # Changelog
 
 
-## [1.2.6] - 2016-04-15
+## [1.2.7] - 2016-04-18
 ### Added
+- Exclude build dir
+
+
+## [1.2.6] - 2016-04-15
+### Fixed
 - Don't timeout
 
 
